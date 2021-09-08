@@ -1,0 +1,38 @@
+# Spring Cloud Streams
+spring.cloud:
+  function.definition: userProcessor;userConsumer;preferenceConsumer
+  stream:
+    bindings:
+      userProcessor-in-0:
+        destination: microsoft-user
+      #       content-type: application/*+avro
+      userProcessor-in-1:
+        destination: user-preferences
+      userProcessor-out-0:
+        destination: filtered-user
+      userConsumer-in-0:
+        destination: filtered-user
+      preferenceConsumer-in-0:
+        destination: user-preferences
+
+    # Kafka Streams
+    kafka:
+      streams:
+        bindings:
+          userProcessor-in-1.consumer.materializedAs: preferences-state-store
+        binder:
+          functions:
+            userProcessor.applicationId: userProcessor-applicationId
+          DeserializationExceptionHandler: logAndContinue
+          #       processing.guarantee: exactly_once
+          configuration:
+            log.cleanup.policy: compact
+            commit.interval.ms: 100
+            #          replication.factor: 3
+            #          acceptable.recovery.lag: 0
+            spring.json:
+              trusted.packages: com.pro.kafka.producer.vendor.microsoft.user
+              use.type.headers: false
+            default:
+              key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
