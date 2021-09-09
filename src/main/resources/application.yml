@@ -15,8 +15,9 @@ spring.cloud:
       preferenceConsumer-in-0:
         destination: user-preferences
 
-    # Kafka Streams
+# Kafka Streams
     kafka:
+      binder.brokers: localhost:29092
       streams:
         bindings:
           userProcessor-in-1.consumer.materializedAs: preferences-state-store
